@@ -10,8 +10,7 @@ import "./HomePage.css";
 import io from "socket.io-client";
 import { joinRoom, getAllUsers } from "./requests";
 import { Link } from "react-router-dom";
-const SOCKET_IO_URL = "http://192.168.50.52:3001";
-const socket = io(SOCKET_IO_URL);
+const SOCKET_IO_URL = "http://34.222.106.164:8000";
 
 
 class HomePage extends Component {
@@ -19,7 +18,7 @@ class HomePage extends Component {
     super(props);
     this.state = {
       users: [],
-      token: '',
+      token: localStorage.getItem("token") ? localStorage.getItem("token").split(' ')[1] : '',
       chats: [],
     }
     this.handleChange = this.handleChange.bind(this);
@@ -27,7 +26,6 @@ class HomePage extends Component {
   }
 
   async getData(){
-    console.log('async getData(){')
     this.socket.emit('all-chats');
     this.socket.emit('all-users');
   }
@@ -35,11 +33,10 @@ class HomePage extends Component {
   componentDidMount(){
     this.socket = io(SOCKET_IO_URL, {
       query: {
-        token: localStorage.getItem("token").split(' ')[1]
+        token: this.state.token
       }
     });
     this.socket.on("connect", data => {
-      console.log('connected')
       this.getData();
     });
 
@@ -52,28 +49,22 @@ class HomePage extends Component {
     });
 
     this.socket.on("new-chat", data => {
-      console.log('new-chat => ', data)
       this.getData();
     });
 
     this.socket.on("disconnect", data => {
-      console.log('disconnect => ')
     });
   }
 
   async handleSubmit (evt) {
     evt.preventDefault();
       try {
-
-        console.log('target.value => ', this.state.token)
         localStorage.setItem("token", this.state.token);
       } catch(error ) {
-        console.log('error => ', error)
       }
   };
 
   createChat(user) {
-    console.log('createChat => ', user)
     this.socket.emit('create-chat', {user: user._id});
   }
 
@@ -83,7 +74,7 @@ class HomePage extends Component {
   users() {
     return this.state.users.map(user => {
       return <div>
-        <li>{user.email} <button onClick={() => this.createChat(user)}>Create chat</button></li>
+        <li style={user.isOnline ? {color: 'green'} : {}} >{user.email} <button onClick={() => this.createChat(user)}>Create chat</button></li>
       </div>
     })
   }

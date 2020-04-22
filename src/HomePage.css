@@ -2,3 +2,16 @@
   width: 90vw;
   margin: 0 auto;
 }
+
+.message {
+  margin-left: 40px;
+  background-color: teal;
+  margin: 20px;
+  padding: 15px;
+  border-radius: 5px;
+  width: unset;
+}
+
+.message img {
+  width: 400px;
+}
